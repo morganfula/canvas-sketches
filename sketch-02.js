@@ -25,11 +25,11 @@ const sketch = () => {
     context.fill();
     context.restore(); //*	Returns previously saved path state and attributes
 
-    // context.translate(100, 400);
+    context.translate(100, 400);
 
-    // context.beginPath();
-    // context.arc(0, 0, 50, 0, Math.PI * 2);
-    // context.fill();
+    context.beginPath();
+    context.arc(0, 0, 50, 0, Math.PI * 2);
+    context.fill();
 
 
   };
