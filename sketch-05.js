@@ -54,6 +54,7 @@ const sketch = ({context, width, height}) => {
         agent.update();
         agent.draw(context)
         agent.bounce(width, height);
+        // agent.wrap(width, height);
       });
     }
   };
@@ -80,6 +81,11 @@ class Agent {
     this.vel = new Vector(random.range(-1,1), random.range(-1,1));
     this.radius = random.range(4, 12);
   }
+
+  // wrap(width, height) {
+  //   if (this.pos.x > width) this.pos.x = 0;
+  //   if (this.pos.y > height) this.pos.y = 0;
+  // }
 
   bounce(width, height) {
     if (this.pos.x <= 0 || this.pos.x >= width) this.vel.x *= -1;
