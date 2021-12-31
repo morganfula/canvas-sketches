@@ -2,117 +2,128 @@ const canvasSketch = require('canvas-sketch');
 const random = require('canvas-sketch-util/random');
 const math = require('canvas-sketch-util/math');
 
-
 const settings = {
-  dimensions: [ 1080, 1080 ],
-  animate: true
+	dimensions: [1080, 1080],
+	animate: true,
 };
 
+const body = (document.querySelector('body').style.backgroundColor = '#202124');
+
 const animate = () => {
-  console.log("Hello world");
-  requestAnimationFrame(animate);
-}
+	console.log('Hello world');
+	requestAnimationFrame(animate);
+};
 // animate();
 
-const sketch = ({context, width, height}) => {
-    const agents = [];
+const sketch = ({ context, width, height }) => {
+	const agents = [];
 
-    for (let i = 0; i < 40; i++) {
-      const x = random.range(0, width);
-      const y = random.range(0, height);
+	for (let i = 0; i < 60; i++) {
+		const x = random.range(0, width);
+		const y = random.range(0, height);
 
-      agents.push(new Agent(x,y))
-    }
+		agents.push(new Agent(x, y));
+	}
 
-    return ({context, width, height}) => {
-      context.fillStyle = '#2d1495';
-      context.fillRect(0, 0, width, height);
+	return ({ context, width, height }) => {
+		const gradient = context.createRadialGradient(
+			height,
+			100,
+			height,
+			90,
+			width,
+			100
+		);
 
-      for (let i = 0; i < agents.length; i++) {
-        const agent = agents[i];
-        
-        for (let j = i + i; j < agents.length; j++) {
-          const other = agents[j]
+		gradient.addColorStop(0, '#011165');
+		gradient.addColorStop(1, '#2972c5');
 
-          const dist = agent.pos.getDistance(other.pos);
-          if (dist > 200) continue;
+		// context.fillStyle = '#2d1495';
+		context.fillStyle = gradient;
+		context.fillRect(0, 0, width, height);
 
-          context.lineWidth = math.mapRange(dist, 0, 200, 12, 1);
-          
-          
-          context.beginPath();
-          context.strokeStyle = 'white';
-          context.shadowBlur = 20;
-          context.shadowColor = "#607be0";
-          context.moveTo(agent.pos.x, agent.pos.y);
-          context.lineTo(other.pos.x, other.pos.y);
-          context.stroke(); 
-        }
-      }
-    
-      agents.forEach(agent => {
-        agent.update();
-        agent.draw(context)
-        agent.bounce(width, height);
-        // agent.wrap(width, height);
-      });
-    }
-  };
+		for (let i = 0; i < agents.length; i++) {
+			const agent = agents[i];
+
+			for (let j = i + i; j < agents.length; j++) {
+				const other = agents[j];
+
+				const dist = agent.pos.getDistance(other.pos);
+				if (dist > 200) continue;
+
+				context.lineWidth = math.mapRange(dist, 0, 200, 12, 1);
+
+				context.beginPath();
+				context.strokeStyle = 'white';
+				context.shadowBlur = 20;
+				context.shadowColor = '#607be0';
+				context.moveTo(agent.pos.x, agent.pos.y);
+				context.lineTo(other.pos.x, other.pos.y);
+				context.stroke();
+			}
+		}
+
+		agents.forEach((agent) => {
+			agent.update();
+			agent.draw(context);
+			agent.bounce(width, height);
+			// agent.wrap(width, height);
+		});
+	};
+};
 
 canvasSketch(sketch, settings);
 
 class Vector {
-  constructor(x, y) {
-    this.x = x;
-    this.y = y;
-  }
+	constructor(x, y) {
+		this.x = x;
+		this.y = y;
+	}
 
-  getDistance(v) {
-    const dx = this.x - v.x;
-    const dy = this.y - v.y;
+	getDistance(v) {
+		const dx = this.x - v.x;
+		const dy = this.y - v.y;
 
-    return Math.sqrt(dx * dx  + dy * dy);
-  }
+		return Math.sqrt(dx * dx + dy * dy);
+	}
 }
 
 class Agent {
-  constructor(x, y) {
-    this.pos = new Vector(x, y);
-    this.vel = new Vector(random.range(-1,1), random.range(-1,1));
-    this.radius = random.range(4, 12);
-  }
+	constructor(x, y) {
+		this.pos = new Vector(x, y);
+		this.vel = new Vector(random.range(-1, 1), random.range(-1, 1));
+		this.radius = random.range(4, 12);
+	}
 
-  // wrap(width, height) {
-  //   if (this.pos.x > width) this.pos.x = 0;
-  //   if (this.pos.y > height) this.pos.y = 0;
-  // }
+	// wrap(width, height) {
+	//   if (this.pos.x > width) this.pos.x = 0;
+	//   if (this.pos.y > height) this.pos.y = 0;
+	// }
 
-  bounce(width, height) {
-    if (this.pos.x <= 0 || this.pos.x >= width) this.vel.x *= -1;
-    if (this.pos.y <= 0 || this.pos.y >= height) this.vel.y *= -1;
-  }
-  
+	bounce(width, height) {
+		if (this.pos.x <= 0 || this.pos.x >= width) this.vel.x *= -1;
+		if (this.pos.y <= 0 || this.pos.y >= height) this.vel.y *= -1;
+	}
 
-  update() {
-    this.pos.x += this.vel.x;
-    this.pos.y += this.vel.y;
-  }
+	update() {
+		this.pos.x += this.vel.x;
+		this.pos.y += this.vel.y;
+	}
 
-  draw(context) {
-    context.save();
-    context.translate(this.pos.x, this.pos.y)
+	draw(context) {
+		context.save();
+		context.translate(this.pos.x, this.pos.y);
 
-    
-    context.lineWidth = 2.5;
-    
-    context.beginPath();
-    context.fillStyle = '#f5ffff';
-    context.shadowBlur = 20;
-    context.shadowColor = "#607be0";
-    context.arc(0, 0, this.radius, 0, Math.PI * 2);
-    context.fill();
-    context.stroke();
+		context.lineWidth = 2.5;
 
-    context.restore(); //* Returns previously saved path state and attributes
-  }
+		context.beginPath();
+		context.fillStyle = '#f5ffff';
+		context.shadowBlur = 20;
+		context.shadowColor = '#607be0';
+		context.arc(0, 0, this.radius, 0, Math.PI * 2);
+		context.fill();
+		context.stroke();
+
+		context.restore(); //* Returns previously saved path state and attributes
+	}
 }
